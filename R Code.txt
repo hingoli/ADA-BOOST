@@ -1,0 +1,19 @@
+           
+data(iris)
+
+iris[iris$Species!="setosa",]->iris       ##drop setosa
+
+n<-dim(iris)[1]                           ##set up testing and training data (60% for training)
+trind<-sample(1:n,floor(.6*n),FALSE)
+teind<-setdiff(1:n,trind)
+iris[,5]<- as.factor((levels(iris[,5])[2:3])[as.numeric(iris[,5])-1])
+
+gdis<-ada(Species~.,data=iris[trind,],iter=20,nu=1,type="discrete")   ##fit 8-split trees
+
+gdis=addtest(gdis,iris[teind,-5],iris[teind,5])   ##add testing data set
+
+plot(gdis,TRUE,TRUE)   ##plot gdis
+
+varplot(gdis)     ##variable selection plot
+
+pairs(gdis,iris[trind,-5],maxvar=2)   ##pairwise plot
